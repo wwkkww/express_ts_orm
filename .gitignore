@@ -1,0 +1,14 @@
+.envrc
+.vscode/
+.DS_Store
+.idea/
+.vscode/
+node_modules/
+dist/
+tmp/
+.next
+.env
+.nvmrc
+.tool-versions
+.dist-test.env
+src/public/style.css
