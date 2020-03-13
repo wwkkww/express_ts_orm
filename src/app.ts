@@ -11,6 +11,8 @@ class App {
     this.connectDatabase()
     this.initializeMiddlewares();
     this.initializeControllers(controllers);
+    // Express runs all the middleware from the first to the last, 
+    // error handlers should be at the end of application stack
     this.initializeErrorHandling()
   }
 
@@ -25,15 +27,19 @@ class App {
   }
 
   private initializeMiddlewares() {
+    console.log("initializeMiddlewares")
+    console.log("bodyparser: express.json() ")
     this.app.use(express.json());
   }
 
   private initializeErrorHandling() {
+    console.log("initializeErrorHandling")
     this.app.use(errorMiddleware);
   }
 
 
   private initializeControllers(controllers: any) {
+    console.log("initializeControllers")
     controllers.forEach((controller: any) => {
       this.app.use('/', controller.router)
     });
