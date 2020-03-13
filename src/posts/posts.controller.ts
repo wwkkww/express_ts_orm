@@ -21,18 +21,24 @@ class PostsController {
   private intializeRoutes() {
     // Get all posts
     this.router.get(this.path, this.getAllPosts)
-
     // Create a post
     this.router.post(this.path, this.createPost)
+    // Get post by id
+    this.router.get(`${this.path}/:id`, this.getPostById)
+    // Delete a post
+    this.router.delete(`${this.path}/:id`, this.deletePost)
 
   }
 
-  getAllPosts = (request: express.Request, response: express.Response) => {
+  private getAllPosts = (request: express.Request, response: express.Response) => {
+    // NOTE: find() method does not cause the query to be executed, 
+    // it happens after call the then function.
+    // Can also do it by calling postModel.find().exec() function that returns a promise
     postModel.find()
       .then((result) => response.send(result))
   };
 
-  createPost = (request: express.Request, response: express.Response) => {
+  private createPost = (request: express.Request, response: express.Response) => {
     const { author, content, title } = request.body
     const postData: IPost = { author, content, title }
     const createdPost = new postModel(postData)
@@ -40,6 +46,29 @@ class PostsController {
     createdPost.save()
       .then(savedPost => response.send(savedPost))
   };
+
+  private getPostById = (request: express.Request, response: express.Response) => {
+    // console.log(request.params)
+    const id = request.params.id;
+    // alternative: postModel.findOne({ _id: id, title: title })
+    postModel.findById(id)
+      .then((post) => response.send(post));
+  };
+
+  private deletePost = (request: express.Request, response: express.Response) => {
+    const id = request.params.id;
+    postModel.findByIdAndDelete(id)
+      .then(result => {
+        console.log(result)
+        if (result) {
+          response.send(result)
+        } else {
+          response.send(404)
+        }
+      })
+  }
+
+
 }
 
 
