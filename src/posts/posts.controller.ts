@@ -1,5 +1,6 @@
 import express from 'express';
 import { IPost } from './post.interface';
+import postModel from './post.model';
 
 class PostsController {
   public router = express.Router();
@@ -9,13 +10,13 @@ class PostsController {
     this.intializeRoutes();
   }
 
-  // private posts: IPost[] = [
-  //   {
-  //     author: 'John',
-  //     content: "Lorem Ipsum",
-  //     title: "My First Post"
-  //   }
-  // ]
+  private posts: IPost[] = [
+    {
+      author: 'John',
+      content: "Lorem Ipsum",
+      title: "My First Post"
+    }
+  ]
 
   private intializeRoutes() {
     // Get all posts
@@ -27,15 +28,17 @@ class PostsController {
   }
 
   getAllPosts = (request: express.Request, response: express.Response) => {
-    // console.log(request.url)
-    // response.send(this.posts);
+    postModel.find()
+      .then((result) => response.send(result))
   };
 
   createPost = (request: express.Request, response: express.Response) => {
     const { author, content, title } = request.body
-    // const post: Post = { author, content, title }
-    // this.posts.push(post)
-    // response.send(post);
+    const postData: IPost = { author, content, title }
+    const createdPost = new postModel(postData)
+
+    createdPost.save()
+      .then(savedPost => response.send(savedPost))
   };
 }
 
