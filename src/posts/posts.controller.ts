@@ -1,8 +1,9 @@
 import express from 'express';
+import Controller from '../interfaces/controller.interface';
 import { IPost } from './post.interface';
 import postModel from './post.model';
 
-class PostsController {
+class PostsController implements Controller {
   public router = express.Router();
   public path = "/posts"
 
