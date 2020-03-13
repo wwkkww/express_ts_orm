@@ -1,15 +1,25 @@
 import express from 'express';
+import mongoose from 'mongoose';
 
 class App {
   public app: express.Application;
-  public port: number;
 
   constructor(controllers: any, port: number) {
     this.app = express();
-    this.port = port
 
+    this.connectDatabase()
     this.initializeMiddlewares();
     this.initializeControllers(controllers)
+  }
+
+  private connectDatabase() {
+    const { MONGO_USER, MONGO_PASSWORD, MONGO_PATH } = process.env;
+    // connect mongoDB
+    mongoose.connect(
+      `mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}${MONGO_PATH}`,
+      { useNewUrlParser: true, useUnifiedTopology: true })
+      .then(() => console.log('MongoDB connected'))
+      .catch((err) => console.log(err))
   }
 
   private initializeMiddlewares() {
@@ -23,7 +33,9 @@ class App {
   }
 
   public listen() {
-    this.app.listen(this.port, () => console.log(`Server started at port${this.port}`))
+    this.app.listen(process.env.PORT, () => {
+      console.log(`Server started at port${process.env.PORT}`)
+    })
   }
 }
 

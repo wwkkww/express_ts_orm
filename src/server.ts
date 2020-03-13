@@ -1,18 +1,12 @@
 import 'dotenv/config';
-import mongoose from 'mongoose';
 import App from './app';
 import postsController from './posts/posts.controller';
+import validateEnv from './utils/validateEnv';
 
-const { MONGO_USER, MONGO_PASSWORD, MONGO_PATH } = process.env;
+validateEnv();
 
-// connect mongoDB
-mongoose.connect(
-  `mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}${MONGO_PATH}`,
-  { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.log(err))
-
-const app = new App([postsController], 5000)
-
+const app = new App([
+  postsController
+], 5000)
 
 app.listen()
