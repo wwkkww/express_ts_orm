@@ -25,6 +25,8 @@ class PostsController {
     this.router.post(this.path, this.createPost)
     // Get post by id
     this.router.get(`${this.path}/:id`, this.getPostById)
+    // Patch a post
+    this.router.patch(`${this.path}/:id`, this.modifyPost)
     // Delete a post
     this.router.delete(`${this.path}/:id`, this.deletePost)
 
@@ -55,6 +57,14 @@ class PostsController {
       .then((post) => response.send(post));
   };
 
+  private modifyPost = (request: express.Request, response: express.Response) => {
+    const id = request.params.id;
+    const postData: IPost = request.body;
+    // { new: true } pass into options to get the new, modified document instead of the old one
+    postModel.findByIdAndUpdate(id, postData, { new: true })
+      .then(post => response.send(post))
+  }
+
   private deletePost = (request: express.Request, response: express.Response) => {
     const id = request.params.id;
     postModel.findByIdAndDelete(id)
@@ -67,8 +77,6 @@ class PostsController {
         }
       })
   }
-
-
 }
 
 
