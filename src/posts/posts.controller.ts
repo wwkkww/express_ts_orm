@@ -30,7 +30,7 @@ class PostsController implements Controller {
     // Get post by id
     this.router.get(`${this.path}/:id`, this.getPostById)
     // Patch a post
-    this.router.patch(`${this.path}/:id`, this.modifyPost)
+    this.router.patch(`${this.path}/:id`, validationMiddleware(CreatePostDto), this.modifyPost)
     // Delete a post
     this.router.delete(`${this.path}/:id`, this.deletePost)
 
