@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import App from './app';
-import PostsController from './posts/posts.controller';
+import postsController from './posts/posts.controller';
 
 const { MONGO_USER, MONGO_PASSWORD, MONGO_PATH } = process.env;
 
@@ -12,7 +12,7 @@ mongoose.connect(
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log(err))
 
-const app = new App([new PostsController()], 5000)
+const app = new App([postsController], 5000)
 
 
 app.listen()

@@ -40,4 +40,5 @@ class PostsController {
 }
 
 
-export default PostsController;
+const postsController = new PostsController()
+export default postsController;
