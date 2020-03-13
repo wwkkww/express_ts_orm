@@ -3,6 +3,8 @@ import Controller from '../interfaces/controller.interface';
 import { IPost } from './post.interface';
 import postModel from './post.model';
 import PostNotFoundException from '../exceptions/PostNotFoundException';
+import validationMiddleware from '../middleware/validation.middleware';
+import CreatePostDto from './post.dto';
 
 class PostsController implements Controller {
   public router = express.Router();
@@ -24,7 +26,7 @@ class PostsController implements Controller {
     // Get all posts
     this.router.get(this.path, this.getAllPosts)
     // Create a post
-    this.router.post(this.path, this.createPost)
+    this.router.post(this.path, validationMiddleware(CreatePostDto), this.createPost)
     // Get post by id
     this.router.get(`${this.path}/:id`, this.getPostById)
     // Patch a post
