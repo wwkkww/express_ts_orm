@@ -6,7 +6,7 @@
 //   title: string;
 // }
 
-export interface IPost {
+export interface Post {
   author: string;
   content?: string;
   title: string;

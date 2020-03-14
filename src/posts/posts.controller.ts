@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import Controller from '../interfaces/controller.interface';
-import { IPost } from './post.interface';
+import { Post } from './post.interface';
 import postModel from './post.model';
 import PostNotFoundException from '../exceptions/PostNotFoundException';
 import validationMiddleware from '../middleware/validation.middleware';
@@ -14,7 +14,7 @@ class PostsController implements Controller {
     this.intializeRoutes();
   }
 
-  private posts: IPost[] = [
+  private posts: Post[] = [
     {
       author: 'John',
       content: "Lorem Ipsum",
@@ -46,7 +46,7 @@ class PostsController implements Controller {
 
   private createPost = (request: Request, response: Response) => {
     const { author, content, title } = request.body
-    const postData: IPost = { author, content, title }
+    const postData: Post = { author, content, title }
     const createdPost = new postModel(postData)
 
     createdPost.save()
@@ -71,7 +71,7 @@ class PostsController implements Controller {
 
   private modifyPost = (request: Request, response: Response) => {
     const id = request.params.id;
-    const postData: IPost = request.body;
+    const postData: Post = request.body;
     // { new: true } pass into options to get the new, modified document instead of the old one
     postModel.findByIdAndUpdate(id, postData, { new: true })
       .then(post => response.send(post))
