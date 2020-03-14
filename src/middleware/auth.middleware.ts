@@ -9,6 +9,7 @@ import userModel from '../users/user.model';
 
 async function authMiddleware(request: RequestWithUser, response: express.Response, next: express.NextFunction) {
   const cookies = request.cookies
+  console.log('authMiddleware', request)
   if (cookies && cookies.Authorization) {
     const secret = String(process.env.JWT_SECRET);
     try {

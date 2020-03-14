@@ -43,15 +43,18 @@ class PostsController implements Controller {
     // it happens after call the then function.
     // Can also do it by calling postModel.find().exec() function that returns a promise
     const posts = await postModel.find()
-    response.send(posts))
+    response.send(posts)
   };
 
   private createPost = async (request: RequestWithUser, response: Response) => {
-    const { author, content, title } = request.body
-    const postData: Post = { author, content, title }
+    const postData: CreatePostDto = request.body
+    let id = ""
+    if (request.user) {
+      id = request.user._id
+    }
     const createdPost = new postModel({
       ...postData,
-      authorId: request.user._id
+      authorId: id
     })
 
     const savedPost = await createdPost.save()
