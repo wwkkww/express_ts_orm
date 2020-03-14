@@ -3,7 +3,7 @@ import Controller from '../interfaces/controller.interface';
 import { Post } from './post.interface';
 import postModel from './post.model';
 import PostNotFoundException from '../exceptions/PostNotFoundException';
-import validationMiddleware from '../middleware/validation.middleware';
+import { validationMiddleware, validationPatchMiddleware } from '../middleware/validation.middleware';
 import CreatePostDto from './post.dto';
 
 class PostsController implements Controller {
@@ -30,7 +30,7 @@ class PostsController implements Controller {
     // Get post by id
     this.router.get(`${this.path}/:id`, this.getPostById)
     // Patch a post
-    this.router.patch(`${this.path}/:id`, validationMiddleware(CreatePostDto), this.modifyPost)
+    this.router.patch(`${this.path}/:id`, validationPatchMiddleware(CreatePostDto), this.modifyPost)
     // Delete a post
     this.router.delete(`${this.path}/:id`, this.deletePost)
 

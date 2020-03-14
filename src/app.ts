@@ -5,7 +5,7 @@ import errorMiddleware from './middleware/error.middleware';
 class App {
   public app: express.Application;
 
-  constructor(controllers: any, port: number) {
+  constructor(controllers: any) {
     this.app = express();
 
     this.connectDatabase()
@@ -41,6 +41,12 @@ class App {
   private initializeControllers(controllers: any) {
     console.log("initializeControllers")
     controllers.forEach((controller: any) => {
+      /**
+       * /posts
+       * /posts/:id
+       * /auth/register
+       * /auth/login
+       */
       this.app.use('/', controller.router)
     });
   }
