@@ -48,6 +48,7 @@ class App {
        * /posts/:id
        * /auth/register
        * /auth/login
+       * /users/:id/posts
        */
       this.app.use('/', controller.router)
     });
