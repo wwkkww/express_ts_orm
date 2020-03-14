@@ -42,7 +42,9 @@ class PostsController implements Controller {
     // NOTE: find() method does not cause the query to be executed, 
     // it happens after call the then function.
     // Can also do it by calling postModel.find().exec() function that returns a promise
-    const posts = await postModel.find()
+    // Can bypass this with async/await
+    // NOTE: execPopulate() is not needed when call populate() on an instance of a QUERY
+    const posts = await postModel.find().populate('author', '-password')
     response.send(posts)
   };
 
@@ -57,8 +59,10 @@ class PostsController implements Controller {
       author: userId
     })
 
-    const savedPost = await createdPost.save()
-    response.send(savedPost)
+    const savedPost = await createdPost.save();
+    // NOTE: execPopulate() needed when call populate() on an instance of a DOCUMENT
+    await savedPost.populate('author', '-password').execPopulate();
+    response.send(savedPost);
   };
 
   private getPostById = async (request: Request, response: Response, next: NextFunction) => {
