@@ -7,6 +7,7 @@ import { validationMiddleware, validationPatchMiddleware } from '../middleware/v
 import CreatePostDto from './post.dto';
 import authMiddleware from '../middleware/auth.middleware';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
+import userModel from '../users/user.model';
 
 class PostsController implements Controller {
   public router = express.Router();
@@ -58,6 +59,12 @@ class PostsController implements Controller {
       ...postData,
       author: userId
     })
+
+    // const user = await userModel.findById(userId);
+    // if (user) {
+    //   user.posts = [...user.posts, createdPost._id];
+    //   await user.save();
+    // }
 
     const savedPost = await createdPost.save();
     // NOTE: execPopulate() needed when call populate() on an instance of a DOCUMENT
