@@ -72,7 +72,7 @@ class AuthenticationController implements Controller {
 
   private logOut = (request: express.Request, response: express.Response) => {
     response.setHeader('Set-Cookie', ['Authorization=;Max-age=0']);
-    response.send(200);
+    response.sendStatus(200);
   }
 
   private createToken(userId: string): TokenData {
