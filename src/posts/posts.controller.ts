@@ -6,6 +6,7 @@ import PostNotFoundException from '../exceptions/PostNotFoundException';
 import { validationMiddleware, validationPatchMiddleware } from '../middleware/validation.middleware';
 import CreatePostDto from './post.dto';
 import authMiddleware from '../middleware/auth.middleware';
+import RequestWithUser from '../interfaces/requestWithUser.interface';
 
 class PostsController implements Controller {
   public router = express.Router();
@@ -30,64 +31,66 @@ class PostsController implements Controller {
     this.router.get(`${this.path}/:id`, this.getPostById)
 
     // chain route handlers to use authMiddleware
-    this.router.all(`${this.path}/*`, authMiddleware)
+    this.router
+      .all(`${this.path}/*`, authMiddleware)
       .patch(`${this.path}/:id`, validationPatchMiddleware(CreatePostDto), this.modifyPost) // Patch a post
       .post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createPost) // Create a post
       .delete(`${this.path}/:id`, this.deletePost) // Delete a post
   }
 
-  private getAllPosts = (request: Request, response: Response) => {
+  private getAllPosts = async (request: Request, response: Response) => {
     // NOTE: find() method does not cause the query to be executed, 
     // it happens after call the then function.
     // Can also do it by calling postModel.find().exec() function that returns a promise
-    postModel.find()
-      .then((result) => response.send(result))
+    const posts = await postModel.find()
+    response.send(posts))
   };
 
-  private createPost = (request: Request, response: Response) => {
+  private createPost = async (request: RequestWithUser, response: Response) => {
     const { author, content, title } = request.body
     const postData: Post = { author, content, title }
-    const createdPost = new postModel(postData)
+    const createdPost = new postModel({
+      ...postData,
+      authorId: request.user._id
+    })
 
-    createdPost.save()
-      .then(savedPost => response.send(savedPost))
+    const savedPost = await createdPost.save()
+    response.send(savedPost)
   };
 
-  private getPostById = (request: Request, response: Response, next: NextFunction) => {
+  private getPostById = async (request: Request, response: Response, next: NextFunction) => {
     // console.log(request.params)
     const id = request.params.id;
     // alternative: postModel.findOne({ _id: id, title: title })
-    postModel.findById(id)
-      .then((post) => {
-        if (post)
-          response.send(post)
-        else {
-          next(new PostNotFoundException(id))
-          // next(new HttpException(404, "Post not found. Please try angain"))
-          // response.status(404).send({ error: "Post not found" })
-        }
-      });
+    const post = await postModel.findById(id)
+    if (post)
+      response.send(post)
+    else {
+      next(new PostNotFoundException(id))
+      // next(new HttpException(404, "Post not found. Please try angain"))
+      // response.status(404).send({ error: "Post not found" })
+    }
+
   };
 
-  private modifyPost = (request: Request, response: Response) => {
+  private modifyPost = async (request: Request, response: Response) => {
     const id = request.params.id;
     const postData: Post = request.body;
     // { new: true } pass into options to get the new, modified document instead of the old one
-    postModel.findByIdAndUpdate(id, postData, { new: true })
-      .then(post => response.send(post))
+    const post = await postModel.findByIdAndUpdate(id, postData, { new: true })
+    response.send(post);
   }
 
-  private deletePost = (request: Request, response: Response, next: NextFunction) => {
+  private deletePost = async (request: Request, response: Response, next: NextFunction) => {
     const id = request.params.id;
-    postModel.findByIdAndDelete(id)
-      .then(result => {
-        if (result) {
-          response.send(result)
-        } else {
-          next(new PostNotFoundException(id))
-          // response.status(404).send({ error: "Post not found" })
-        }
-      })
+    const result = await postModel.findByIdAndDelete(id)
+    if (result) {
+      response.send(result)
+    } else {
+      next(new PostNotFoundException(id))
+      // response.status(404).send({ error: "Post not found" })
+    }
+
   }
 }
 
