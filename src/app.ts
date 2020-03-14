@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import cookieParser from 'cookie-parser';
 import errorMiddleware from './middleware/error.middleware';
 
 class App {
@@ -27,9 +28,10 @@ class App {
   }
 
   private initializeMiddlewares() {
-    console.log("initializeMiddlewares")
-    console.log("bodyparser: express.json() ")
+    console.log("initializeMiddlewares: express.json()")
+    console.log("initializeMiddlewares: cookieParser()")
     this.app.use(express.json());
+    this.app.use(cookieParser())
   }
 
   private initializeErrorHandling() {

@@ -36,7 +36,7 @@ class AuthenticationController implements Controller {
       const passwordMatch = await bcrypt.compare(logInData.password, user.password)
       if (passwordMatch) {
         user.password = "********"
-        const tokenData: TokenData = this.createToken(newUser._id)
+        const tokenData: TokenData = this.createToken(user._id)
         response.setHeader('Set-Cookie', [this.createCookie(tokenData)])
         response.send(user)
       } else {
