@@ -11,6 +11,15 @@ const userSchema = new mongoose.Schema({
   name: String,
   email: String,
   password: String,
+
+  // Many-to-Many (two-way referencing): 
+  // A user can be author of many Posts 
+  posts: [
+    {
+      ref: 'Post',
+      type: mongoose.Schema.Types.ObjectId,
+    }
+  ]
 })
 
 type UserType = User & mongoose.Document

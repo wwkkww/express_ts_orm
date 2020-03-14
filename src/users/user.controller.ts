@@ -24,6 +24,7 @@ class UserController implements Controller {
     if (request.user) {
       currentUserId = String(request.user._id)
     }
+    // Only person logged in can get a list of all his posts
     // check current_user id === request.params userId
     if (paramsUserId === currentUserId) {
       const posts = await postModel.find({ author: paramsUserId })
