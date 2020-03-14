@@ -48,13 +48,13 @@ class PostsController implements Controller {
 
   private createPost = async (request: RequestWithUser, response: Response) => {
     const postData: CreatePostDto = request.body
-    let id = ""
+    let userId = ""
     if (request.user) {
-      id = request.user._id
+      userId = request.user._id
     }
     const createdPost = new postModel({
       ...postData,
-      authorId: id
+      author: userId
     })
 
     const savedPost = await createdPost.save()
