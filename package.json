@@ -21,8 +21,10 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.4",
+    "pg": "^7.18.2",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^8.6.2",
+    "typeorm": "^0.2.24",
     "typescript": "^3.8.3"
   },
   "devDependencies": {
