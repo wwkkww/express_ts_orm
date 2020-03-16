@@ -13,3 +13,4 @@ tmp/
 .dist-test.env
 src/public/style.css
 docker.env
+/data
