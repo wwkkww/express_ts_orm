@@ -1,12 +1,10 @@
 import 'dotenv/config';
+import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import App from './app';
 import postController from './posts/post.controller';
-import authenticationController from './authentication/authentication.controller';
-import userController from './users/user.controller';
-import reportController from './report/report.controller';
-import validateEnv from './utils/validateEnv';
 import config from './ormconfig';
+import validateEnv from './utils/validateEnv';
 
 validateEnv();
 
@@ -14,7 +12,11 @@ validateEnv();
   async () => {
     try {
       // init orm config
-      await createConnection(config)
+      console.log(config);
+      await createConnection(config);
+      console.log('PG connected.');
+
+
     } catch (error) {
       console.log('Error while connection to database ', error)
       return error;
