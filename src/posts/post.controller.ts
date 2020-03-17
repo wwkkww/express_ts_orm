@@ -3,7 +3,7 @@ import Controller from '../interfaces/controller.interface';
 import { Post } from './post.interface';
 import postModel from './post.model';
 import PostNotFoundException from '../exceptions/PostNotFoundException';
-import { validationMiddleware, validationPatchMiddleware } from '../middleware/validation.middleware';
+import { validationMiddleware } from '../middleware/validation.middleware';
 import CreatePostDto from './post.dto';
 import authMiddleware from '../middleware/auth.middleware';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
@@ -34,7 +34,7 @@ class PostsController implements Controller {
     // chain route handlers to use authMiddleware
     this.router
       .all(`${this.path}/*`, authMiddleware)
-      .patch(`${this.path}/:id`, validationPatchMiddleware(CreatePostDto), this.modifyPost) // Patch a post
+      .patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost) // Patch a post
       .post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createPost) // Create a post
       .delete(`${this.path}/:id`, this.deletePost) // Delete a post
   }
