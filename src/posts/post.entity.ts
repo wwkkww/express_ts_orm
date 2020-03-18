@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, BeforeInsert } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, BeforeInsert, ManyToOne } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid'
+import User from '../users/user.entity';
 
 @Entity()
 class Post {
@@ -18,6 +19,13 @@ class Post {
   addId() {
     this.id = uuidv4();
   }
+
+  // OneToMany can’t exist without ManyToOne
+  @ManyToOne(() => User, (author: User) => author.posts, {
+    eager: true
+  })
+  public author: User;
+
 }
 
 export default Post;

@@ -15,6 +15,7 @@ class Address {
   @Column()
   public country: string;
 
+  // Inverse relationship with user
   @OneToOne(() => User, (user: User) => user.address)
   public user: User
 }

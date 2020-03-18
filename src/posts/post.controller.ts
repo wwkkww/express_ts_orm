@@ -25,23 +25,28 @@ class PostsController implements Controller {
   }
 
   private intializeRoutes() {
-    this.router.post(this.path, validationMiddleware(CreatePostDto), this.createPost);
-    this.router.get(this.path, this.getAllPosts);
-    this.router.get(`${this.path}/:id`, this.getPostById);
-    this.router.patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost);
-    this.router.delete(`${this.path}/:id`, this.deletePost);
+    // this.router.post(this.path, validationMiddleware(CreatePostDto), this.createPost);
+    // this.router.get(this.path, this.getAllPosts);
+    // this.router.get(`${this.path}/:id`, this.getPostById);
+    // this.router.patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost);
+    // this.router.delete(`${this.path}/:id`, this.deletePost);
 
-    // // Get all posts
-    // this.router.get(this.path, this.getAllPosts)
-    // // Get post by id
-    // this.router.get(`${this.path}/:id`, this.getPostById)
+    /**
+    *
+    * MONGODB CODE
+    *
+    */
+    // Get all posts
+    this.router.get(this.path, this.getAllPosts)
+    // Get post by id
+    this.router.get(`${this.path}/:id`, this.getPostById)
 
-    // // chain route handlers to use authMiddleware
-    // this.router
-    //   .all(`${this.path}/*`, authMiddleware)
-    //   .patch(`${this.path}/:id`, validationPatchMiddleware(CreatePostDto, true), this.modifyPost) // Patch a post
-    //   .post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createPost) // Create a post
-    //   .delete(`${this.path}/:id`, this.deletePost) // Delete a post
+    // chain route handlers to use authMiddleware
+    this.router
+      .all(`${this.path}/*`, authMiddleware)
+      .patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost) // Patch a post
+      .post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createPost) // Create a post
+      .delete(`${this.path}/:id`, this.deletePost) // Delete a post
   }
 
   private getAllPosts = async (request: Request, response: Response) => {
@@ -65,11 +70,18 @@ class PostsController implements Controller {
   private createPost = async (request: RequestWithUser, response: Response) => {
     const postData: CreatePostDto = request.body
 
-    console.log("postData", postData)
+    console.log("request.user", request.user)
 
-    const newPost = getRepository(Post).create(postData)
+    // const newPost = getRepository(Post).create(postData)
+
+    // Many-To-One (add user to new Post)
+    const newPost = getRepository(Post).create({
+      ...postData,
+      author: request.user,
+    })
     console.log("newPost", newPost)
     await getRepository(Post).save(newPost)
+
     response.send(newPost)
 
     /**

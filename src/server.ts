@@ -5,6 +5,8 @@ import App from './app';
 import postController from './posts/post.controller';
 import config from './ormconfig';
 import validateEnv from './utils/validateEnv';
+import addressController from './address/address.controller';
+import authenticationController from './authentication/authentication.controller';
 
 validateEnv();
 
@@ -12,7 +14,7 @@ validateEnv();
   async () => {
     try {
       // init orm config
-      console.log(config);
+      // console.log(config);
       await createConnection(config);
       console.log('PG connected.');
 
@@ -24,7 +26,9 @@ validateEnv();
 
     const app = new App(
       [
-        postController
+        authenticationController,
+        postController,
+        addressController
       ]
     );
     app.listen();

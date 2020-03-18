@@ -8,9 +8,11 @@ import userModel from '../users/user.model';
 import EmailAlreadyExistException from '../exceptions/EmailAlreadyExistException';
 import WrongCredentialException from '../exceptions/WrongCredentialException';
 import { validationMiddleware } from '../middleware/validation.middleware';
-import User from '../users/user.interface';
+// import User from '../users/user.interface';
 import TokenData from '../interfaces/tokenData.interface';
 import DataStoreInToken from '../interfaces/dataStoredInToken';
+import { getRepository } from 'typeorm';
+import User from '../users/user.entity';
 
 class AuthenticationController implements Controller {
   router = express.Router();
@@ -31,13 +33,13 @@ class AuthenticationController implements Controller {
   }
 
   private logIn = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-    const logInData: LogInDto = request.body
-    const user = await userModel.findOne({ email: logInData.email })
+    const loginData: LogInDto = request.body;
+    const user = await getRepository(User).findOne({ email: loginData.email });
     if (user) {
-      const passwordMatch = await bcrypt.compare(logInData.password, user.password)
+      const passwordMatch = await bcrypt.compare(loginData.password, user.password);
       if (passwordMatch) {
-        user.password = "********"
-        const tokenData: TokenData = this.createToken(user._id)
+        user.password = "**********"
+        const tokenData: TokenData = this.createToken(user.id)
         response.setHeader('Set-Cookie', [this.createCookie(tokenData)])
         response.send(user)
       } else {
@@ -46,28 +48,72 @@ class AuthenticationController implements Controller {
     } else {
       next(new WrongCredentialException())
     }
+
+    /**
+     *
+     * MONGODB CODE
+     *
+     */
+    // const logInData: LogInDto = request.body
+    // const user = await userModel.findOne({ email: logInData.email })
+    // if (user) {
+    //   const passwordMatch = await bcrypt.compare(logInData.password, user.password)
+    //   if (passwordMatch) {
+    //     user.password = "********"
+    //     const tokenData: TokenData = this.createToken(user._id)
+    //     response.setHeader('Set-Cookie', [this.createCookie(tokenData)])
+    //     response.send(user)
+    //   } else {
+    //     next(new WrongCredentialException())
+    //   }
+    // } else {
+    //   next(new WrongCredentialException())
+    // }
   }
 
   private registration = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
     const userData: CreateUserDto = request.body;
-    const user = await userModel.findOne({ email: userData.email })
-    if (user) {
+    if (await getRepository(User).findOne({ email: userData.email })) {
       next(new EmailAlreadyExistException(userData.email))
     } else {
       const hashedPassword = await bcrypt.hash(userData.password, 10)
-      const newUser = await userModel.create({
+      const newUser = getRepository(User).create({
         ...userData,
         password: hashedPassword
       });
-      newUser.password = "********"
-      const tokenData: TokenData = this.createToken(newUser._id)
-      // store token in a cookie. 
-      // Token automatically send to server in Cookie header on each request
-      //Server parses the cookie, check token and respond accordingly
-      response.setHeader('Set-Cookie', [this.createCookie(tokenData)])
+      await getRepository(User).save(newUser);
+      newUser.password = "**********";
 
+      const tokenData: TokenData = this.createToken(newUser.id)
+      response.setHeader('Set-Cookie', [this.createCookie(tokenData)])
       response.send(newUser)
     }
+
+
+    /**
+     * 
+     * MONGODB CODE
+     * 
+     */
+    // const userData: CreateUserDto = request.body;
+    // const user = await userModel.findOne({ email: userData.email })
+    // if (user) {
+    //   next(new EmailAlreadyExistException(userData.email))
+    // } else {
+    //   const hashedPassword = await bcrypt.hash(userData.password, 10)
+    //   const newUser = await userModel.create({
+    //     ...userData,
+    //     password: hashedPassword
+    //   });
+    //   newUser.password = "********"
+    //   const tokenData: TokenData = this.createToken(newUser._id)
+    //   // store token in a cookie. 
+    //   // Token automatically send to server in Cookie header on each request
+    //   //Server parses the cookie, check token and respond accordingly
+    //   response.setHeader('Set-Cookie', [this.createCookie(tokenData)])
+
+    //   response.send(newUser)
+    // }
   }
 
   private logOut = (request: express.Request, response: express.Response) => {

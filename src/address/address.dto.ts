@@ -9,5 +9,6 @@ class CreateAddressDto {
 
   @IsString()
   public country: string;
-
 }
+
+export default CreateAddressDto;
