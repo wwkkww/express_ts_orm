@@ -1,6 +1,6 @@
 import { IsString } from "class-validator";
 
-class CategoryDto {
+class CreateCategoryDto {
   @IsString()
   public id: string;
 
@@ -8,4 +8,4 @@ class CategoryDto {
   public name: string;
 }
 
-export default CategoryDto;
+export default CreateCategoryDto;

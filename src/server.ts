@@ -7,6 +7,7 @@ import config from './ormconfig';
 import validateEnv from './utils/validateEnv';
 import addressController from './address/address.controller';
 import authenticationController from './authentication/authentication.controller';
+import categoryController from './category/category.controller';
 
 validateEnv();
 
@@ -28,7 +29,8 @@ validateEnv();
       [
         authenticationController,
         postController,
-        addressController
+        addressController,
+        categoryController
       ]
     );
     app.listen();
