@@ -16,7 +16,10 @@ validateEnv();
     try {
       // init orm config
       // console.log(config);
-      await createConnection(config);
+      const connection = await createConnection(config);
+
+      // run migration in the code 
+      // await connection.runMigrations()
       console.log('PG connected.');
 
 
