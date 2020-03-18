@@ -8,7 +8,7 @@ import CategoryNotFoundException from '../exceptions/CategoryNotFoundException';
 
 
 class CategoryController implements Controller {
-  public path = "/category";
+  public path = "/categories";
   public router = express.Router();
 
   constructor() {
@@ -24,14 +24,15 @@ class CategoryController implements Controller {
 
 
   private getAllCategories = async (request: express.Request, response: express.Response) => {
-    const categories = await getRepository(Category).find();
+    // Relations property name refer to format defined in Entity class
+    const categories = await getRepository(Category).find({ relations: ['posts'] });
     response.send(categories)
   }
 
 
   private getAllCategoryById = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
     const catId = request.params.id;
-    const category = await getRepository(Category).findOne({ id: catId })
+    const category = await getRepository(Category).findOne({ id: catId }, { relations: ['posts'] })
     if (category) {
       response.send(category);
     } else {
