@@ -13,10 +13,12 @@ import TokenData from '../interfaces/tokenData.interface';
 import DataStoreInToken from '../interfaces/dataStoredInToken';
 import { getRepository } from 'typeorm';
 import User from '../users/user.entity';
+import AuthenticationService from './authentication.service';
 
 class AuthenticationController implements Controller {
   router = express.Router();
   path = '/auth';
+  private authenticationService = new AuthenticationService()
 
   constructor() {
     this.initializeRoutes()
@@ -39,8 +41,8 @@ class AuthenticationController implements Controller {
       const passwordMatch = await bcrypt.compare(loginData.password, user.password);
       if (passwordMatch) {
         user.password = "**********"
-        const tokenData: TokenData = this.createToken(user.id)
-        response.setHeader('Set-Cookie', [this.createCookie(tokenData)])
+        const tokenData: TokenData = this.authenticationService.createToken(user.id)
+        response.setHeader('Set-Cookie', [this.authenticationService.createCookie(tokenData)])
         response.send(user)
       } else {
         next(new WrongCredentialException())
@@ -73,47 +75,13 @@ class AuthenticationController implements Controller {
 
   private registration = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
     const userData: CreateUserDto = request.body;
-    if (await getRepository(User).findOne({ email: userData.email })) {
-      next(new EmailAlreadyExistException(userData.email))
-    } else {
-      const hashedPassword = await bcrypt.hash(userData.password, 10)
-      const newUser = getRepository(User).create({
-        ...userData,
-        password: hashedPassword
-      });
-      await getRepository(User).save(newUser);
-      newUser.password = "**********";
-
-      const tokenData: TokenData = this.createToken(newUser.id)
-      response.setHeader('Set-Cookie', [this.createCookie(tokenData)])
+    try {
+      const { cookie, newUser } = await this.authenticationService.register(userData)
+      response.setHeader('Set-Cookie', [cookie]);
       response.send(newUser)
+    } catch (error) {
+      next(error)
     }
-
-
-    /**
-     * 
-     * MONGODB CODE
-     * 
-     */
-    // const userData: CreateUserDto = request.body;
-    // const user = await userModel.findOne({ email: userData.email })
-    // if (user) {
-    //   next(new EmailAlreadyExistException(userData.email))
-    // } else {
-    //   const hashedPassword = await bcrypt.hash(userData.password, 10)
-    //   const newUser = await userModel.create({
-    //     ...userData,
-    //     password: hashedPassword
-    //   });
-    //   newUser.password = "********"
-    //   const tokenData: TokenData = this.createToken(newUser._id)
-    //   // store token in a cookie. 
-    //   // Token automatically send to server in Cookie header on each request
-    //   //Server parses the cookie, check token and respond accordingly
-    //   response.setHeader('Set-Cookie', [this.createCookie(tokenData)])
-
-    //   response.send(newUser)
-    // }
   }
 
   private logOut = (request: express.Request, response: express.Response) => {
@@ -121,20 +89,6 @@ class AuthenticationController implements Controller {
     response.sendStatus(200);
   }
 
-  private createToken(userId: string): TokenData {
-    const expiresIn: number = 60 * 60 * 12 // 12 hours
-    const dataStoredInToken: DataStoreInToken = {
-      _id: userId
-    }
-    return {
-      token: jwt.sign(dataStoredInToken, String(process.env.JWT_SECRET), { expiresIn }),
-      expiresIn
-    }
-  }
-
-  private createCookie(tokenData: TokenData) {
-    return `Authorization=${tokenData.token}; httpOnly; Max-Age=${tokenData.expiresIn}`
-  }
 }
 
 const authenticationController = new AuthenticationController()
