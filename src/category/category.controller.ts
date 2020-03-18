@@ -4,6 +4,7 @@ import CreateCategoryDto from './category.dto';
 import Category from './category.entity';
 import { getRepository } from 'typeorm';
 import { validationMiddleware } from '../middleware/validation.middleware';
+import CategoryNotFoundException from '../exceptions/CategoryNotFoundException';
 
 
 class CategoryController implements Controller {
@@ -29,7 +30,13 @@ class CategoryController implements Controller {
 
 
   private getAllCategoryById = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-
+    const catId = request.params.id;
+    const category = await getRepository(Category).findOne({ id: catId })
+    if (category) {
+      response.send(category);
+    } else {
+      next(new CategoryNotFoundException(catId))
+    }
   }
 
   private createCategory = async (request: express.Request, response: express.Response) => {
