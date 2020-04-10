@@ -8,6 +8,7 @@ import validateEnv from './utils/validateEnv';
 import addressController from './address/address.controller';
 import authenticationController from './authentication/authentication.controller';
 import categoryController from './category/category.controller';
+import userController from './users/user.controller';
 
 validateEnv();
 
@@ -33,7 +34,8 @@ validateEnv();
         authenticationController,
         postController,
         addressController,
-        categoryController
+        categoryController,
+        userController
       ]
     );
     app.listen();
